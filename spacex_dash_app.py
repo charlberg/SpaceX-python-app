@@ -20,21 +20,18 @@ app.layout = html.Div(children=[
 
     # TASK 1: Add a dropdown list to enable Launch Site selection
     # The default select value is for ALL sites
-    html.Div([
-        dcc.Dropdown(
-            id='site-dropdown',
-            options=[
+    dcc.Dropdown(
+        id='entered_site',
+        options=[
                 {'label': 'All Sites', 'value': 'ALL'},
                 {'label': 'CCAFS LC-40', 'value': 'CCAFS LC-40'},
                 {'label': 'VAFB SLC-4E', 'value': 'VAFB SLC-4E'},
                 {'label': 'KSC LC-39A', 'value': 'KSC LC-39A'},
                 {'label': 'CCAFS SLC-40', 'value': 'CCAFS SLC-40'}
             ],
-            value='ALL',
-            placeholder='Select a Launch Site here',
-            searchable=True
-        )
-    ]),
+        value='ALL',
+        placeholder='Select a Launch Site here',
+        searchable=True),
     html.Br(),
 
     # TASK 2: Add a pie chart to show the total successful launches count for all sites
@@ -47,22 +44,33 @@ app.layout = html.Div(children=[
     dcc.RangeSlider(
         id='payload-slider',
         min=0,
-        max=10000,
+        max=20000,
         step=1000,
-        marks={0: '0', 100: '100'},
-        value=[min_payload, max_payload]
-    ),
+        marks={0: '0', 1000: '1000',
+               2000: '2000', 3000: '3000',
+               4000: '4000', 5000: '5000',
+               6000: '6000', 7000: '7000',
+               8000: '8000', 9000: '9000',
+               10000: '10000', 11000: '11000',
+               12000: '12000', 13000: '13000',
+               14000: '14000', 15000: '15000',
+               16000: '16000', 17000: '17000',
+               18000: '18000', 19000: '19000',
+               20000: '20000'
+               },
+            value=[min_payload, max_payload]
+        ),
 
     # TASK 4: Add a scatter chart to show the correlation between payload and launch success
     html.Div(dcc.Graph(id='success-payload-scatter-chart')),
-])
+    ])
 
 
 # TASK 2:
 # Add a callback function for `site-dropdown` as input, `success-pie-chart` as output
 @app.callback(
     Output(component_id='success-pie-chart', component_property='figure'),
-    Input(component_id='site-dropdown', component_property='value')
+    Input(component_id='entered_site', component_property='value')
 )
 def get_pie_chart(entered_site):
     if entered_site == 'ALL':
@@ -73,19 +81,17 @@ def get_pie_chart(entered_site):
         return fig
     else:
         # return the outcomes piechart for a selected site
-        fig = px.pie(
-            data=spacex_df.loc[spacex_df['Launch Site'] == entered_site],
+        fig = px.pie(spacex_df.loc[spacex_df['Launch Site'] == entered_site],
             names='class',
             title='Total Successful Launches for ' + entered_site
         )
         return fig
 
-
 # TASK 4:
 # Add a callback function for `site-dropdown` and `payload-slider` as inputs, `success-payload-scatter-chart` as output
 @app.callback(
     Output(component_id='success-payload-scatter-chart', component_property='figure'),
-    [Input(component_id='site-dropdown', component_property='value'),
+    [Input(component_id='entered_site', component_property='value'),
      Input(component_id='payload-slider', component_property='value')]
 )
 def get_scatter_chart(entered_site, slider_range):
